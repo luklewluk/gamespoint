@@ -19,7 +19,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('library');
+        if (Auth::check()) {
+            return view('library');
+        }
+        return redirect('/');
     }
 
     /**
