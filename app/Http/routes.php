@@ -13,9 +13,31 @@
 
 Route::get('/', 'HomeController@index');
 
+Route::controllers([
+    'auth' => 'Auth\AuthController',
+    'password' => 'Auth\PasswordController',
+]);
+
 // TODO: Create methods below
-Route::get('/user/login', 'UserController@login');
-Route::get('/user/register', 'UserController@create');
+Route::get('/user', function(){
+    if (Auth::check()){
+        return redirect('user/library');
+    }
+    else return redirect('user/login');
+});
+
+Route::get('/user/login', function(){
+    return view('auth.login');
+});
+
+Route::get('/user/logout', function(){
+    Auth::logout();
+    return redirect('/');
+});
+Route::get('/user/register', function(){
+   return view('auth.register');
+});
+
 // Library management & list of your games
 Route::get('/user/library', 'UserController@index');
 // Pass/email/nick change...
