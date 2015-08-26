@@ -18,34 +18,33 @@ Route::controllers([
     'password' => 'Auth\PasswordController',
 ]);
 
-// TODO: Create methods below
+Route::group(['middleware' => 'auth'], function () {
+    // Library management & list of your games
+    Route::get('/user/library', 'UserController@index');
+    // Pass/email/nick change...
+    Route::get('/user/profile', 'UserController@edit');
+    Route::get('/profile/{id}', 'UserController@show');
+    // Compare user's library with yours
+    Route::get('/profile/{id}/compare', 'UserController@compare');
+    // Search by id/name/email
+    Route::get('/profile/search', 'UserController@search');
+});
+
 Route::get('/user', function(){
-    if (Auth::check()){
-        return redirect('user/library');
-    }
-    else return redirect('user/login');
+    return redirect('user/library');
 });
 
 Route::get('/user/login', function(){
     return view('auth.login');
 });
 
-Route::get('/user/logout', function(){
-    Auth::logout();
-    return redirect('/');
-});
+Route::get('/user/logout', 'UserController@logout');
+
 Route::get('/user/register', function(){
    return view('auth.register');
 });
 
-// Library management & list of your games
-Route::get('/user/library', 'UserController@index');
-// Pass/email/nick change...
-Route::get('/user/profile', 'UserController@edit');
-Route::get('/profile/{id}', 'UserController@show');
-// Compare user's library with yours
-Route::get('/profile/{id}/compare', 'UserController@compare');
-// Search by id/name/email
-Route::get('/profile/search', 'UserController@search');
+// Games list
+Route::get('/games', 'GameController@index');
 // Game details
 Route::get('/game/{id}', 'GameController@show');
