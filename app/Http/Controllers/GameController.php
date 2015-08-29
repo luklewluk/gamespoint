@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
@@ -17,9 +18,15 @@ class GameController extends Controller
      */
     public function index()
     {
-        $games = DB::table('games')->paginate(15);
+        // TODO: Below code
+        $games = DB::table('games')->users()->paginate(15);
         $games->setPath('games');
-        return view('games', ['games' => $games]);
+        $ownGames = DB::table('user_games')->where('id_user', Auth::id());
+        $test = $games->users()->get();
+        echo '<pre>';
+        var_dump($test);
+        echo '</pre>';
+        //return view('games', ['games' => $games]);
     }
 
     /**

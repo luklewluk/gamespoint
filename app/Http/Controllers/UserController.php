@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Game;
 use App\User;
+use App\UserGames;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -105,5 +108,17 @@ class UserController extends Controller
     {
         Auth::logout();
         return redirect('/');
+    }
+
+    public function gameAdd(Request $request, $id)
+    {
+        if (Game::find($id) === null) return 'Bad request';
+        $user = Auth::user();
+        if ($user->games()->where('game_id', $id)->first() === null){
+            $user->games()->save(Game::find($id));
+            return back()->with('success', $id);
+        }
+
+        return back();
     }
 }
