@@ -22,10 +22,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (Auth::check()) {
-            return view('library');
-        }
-        return redirect('/');
+        return view('library');
     }
 
     /**
@@ -116,9 +113,22 @@ class UserController extends Controller
         $user = Auth::user();
         if ($user->games()->where('game_id', $id)->first() === null){
             $user->games()->save(Game::find($id));
-            return back()->with('success', $id);
+            return back()->with('added', $id);
         }
 
         return back();
+    }
+
+    public function gameRemove(Request $request, $id)
+    {
+        if (Game::find($id) === null) return 'Bad request';
+        $user = Auth::user();
+        $game = $user->games()->where('game_id', $id)->first();
+        if ($game === null){
+            return back();
+        }
+
+        $user->games()->detach($id);
+        return back()->with('deleted', $id);
     }
 }

@@ -22,6 +22,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Library management & list of your games
     Route::get('/user/library', 'UserController@index');
     Route::get('/user/library/add/{id}', 'UserController@gameAdd');
+    Route::get('/user/library/remove/{id}', 'UserController@gameRemove');
     // Pass/email/nick change...
     Route::get('/user/profile', 'UserController@edit');
     Route::get('/profile/{id}', 'UserController@show');

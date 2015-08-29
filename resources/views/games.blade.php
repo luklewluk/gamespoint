@@ -4,8 +4,11 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-@if (session('success'))
-    Game {{ session('success') }} added successfully to your library
+@if (session('added'))
+    Game {{ session('added') }} added successfully to your library
+@endif
+@if (session('deleted'))
+    Game {{ session('deleted') }} removed from your library
 @endif
 
 <div class="container">
