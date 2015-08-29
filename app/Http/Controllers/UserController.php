@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Game;
 use App\User;
+use App\UserGames;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -19,10 +22,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (Auth::check()) {
-            return view('library');
-        }
-        return redirect('/');
+        $user = Auth::user();
+        $games = $user->games()->orderBy('name')->get();
+        return view('library', ['games' => $games]);
     }
 
     /**
@@ -105,5 +107,30 @@ class UserController extends Controller
     {
         Auth::logout();
         return redirect('/');
+    }
+
+    public function gameAdd(Request $request, $id)
+    {
+        if (Game::find($id) === null) return 'Bad request';
+        $user = Auth::user();
+        if ($user->games()->where('game_id', $id)->first() === null){
+            $user->games()->save(Game::find($id));
+            return back()->with('added', $id);
+        }
+
+        return back();
+    }
+
+    public function gameRemove(Request $request, $id)
+    {
+        if (Game::find($id) === null) return 'Bad request';
+        $user = Auth::user();
+        $game = $user->games()->where('game_id', $id)->first();
+        if ($game === null){
+            return back();
+        }
+
+        $user->games()->detach($id);
+        return back()->with('deleted', $id);
     }
 }

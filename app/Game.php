@@ -27,4 +27,11 @@ class Game extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The users that belong to the game.
+     */
+    public function users()
+    {
+        return $this->belongsToMany('App\User');
+    }
 }
