@@ -18,7 +18,7 @@ class GameController extends Controller
      */
     public function index()
     {
-        $games = DB::table('games')->paginate(15);
+        $games = DB::table('games')->orderBy('name')->paginate(15);
         $games->setPath('games');
         $user = Auth::user();
 
