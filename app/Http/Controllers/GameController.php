@@ -18,15 +18,21 @@ class GameController extends Controller
      */
     public function index()
     {
-        // TODO: Below code
-        $games = DB::table('games')->users()->paginate(15);
+        $games = DB::table('games')->paginate(15);
         $games->setPath('games');
-        $ownGames = DB::table('user_games')->where('id_user', Auth::id());
-        $test = $games->users()->get();
-        echo '<pre>';
-        var_dump($test);
-        echo '</pre>';
-        //return view('games', ['games' => $games]);
+        $user = Auth::user();
+
+        foreach ($games as $game)
+        {
+            if ($user->games()->where('game_id', $game->id)->first()) {
+                $game->own = true;
+            }
+            else {
+                $game->own = false;
+            }
+        }
+
+        return view('games', ['games' => $games]);
     }
 
     /**

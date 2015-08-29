@@ -10,11 +10,13 @@
 
 <div class="container">
     @foreach ($games as $game)
-        {{ $game->name }} <a href="{{ url('/user/library/add/' . $game->id) }}">Add to library</a><br>
-        <?php
-            $test = $game->user->id;
-            var_dump($test);
-        ?>
+        {{ $game->name }}
+        @if (!$game->own)
+            <a href="{{ url('/user/library/add/' . $game->id) }}">Add to library</a>
+        @else
+            <a href="{{ url('/user/library/remove/' . $game->id) }}">Remove from library</a>
+        @endif
+        <br>
     @endforeach
 </div>
 
