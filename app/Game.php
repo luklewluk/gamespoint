@@ -18,7 +18,7 @@ class Game extends Model
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'platform', 'original_release_date'];
+    protected $fillable = ['id', 'name', 'platform', 'original_release_date', 'small_image'];
 
     /**
      * Indicates if the model should be timestamped.

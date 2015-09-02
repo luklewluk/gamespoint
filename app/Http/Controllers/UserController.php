@@ -23,7 +23,7 @@ class UserController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $games = $user->games()->orderBy('name')->get();
+        $games = $user->games()->orderBy('name')->paginate(8);
         return view('library', ['games' => $games]);
     }
 

@@ -53,13 +53,14 @@ class ImportGames extends Command
      * @param $platform
      * @param $original_release_date
      */
-    protected function saveGame($id, $name, $platform, $original_release_date)
+    protected function saveGame($gameData, $platform)
     {
         $game = new Game();
-        $game->id = $id;
-        $game->name = $name;
+        $game->id = $gameData->id;
+        $game->name = $gameData->name;
         $game->platform = $platform;
-        $game->original_release_date = $original_release_date;
+        $game->original_release_date = $gameData->original_release_date;
+        $game->small_image = $gameData->image !== null ? $gameData->image->small_url : null;
         $game->save();
     }
 
@@ -73,7 +74,7 @@ class ImportGames extends Command
      */
     protected function downloadGameList($platform, $offset = 0, $limit = 0)
     {
-        $json = file_get_contents("http://www.giantbomb.com/api/games/?api_key=$this->apiKey&format=json&limit=$limit&offset=$offset&filter=platforms:$platform&field_list=id,name,original_release_date");
+        $json = file_get_contents("http://www.giantbomb.com/api/games/?api_key=$this->apiKey&format=json&limit=$limit&offset=$offset&filter=platforms:$platform&field_list=id,name,original_release_date,image");
         $obj = json_decode($json);
         if ($obj->error !== "OK") throw new \Exception($obj->error);
         return $obj;
@@ -106,7 +107,7 @@ class ImportGames extends Command
             $obj = $this->downloadGameList($platform, ($site * 100) + $last);
             for ($i = 0; $i < $obj->number_of_page_results; $i++) {
                 // TODO: What if the game is for many platforms and already exist?
-                $this->saveGame($obj->results[$i]->id, $obj->results[$i]->name, $platform, $obj->results[$i]->original_release_date);
+                $this->saveGame($obj->results[$i], $platform);
             }
             $bar->advance();
         }
