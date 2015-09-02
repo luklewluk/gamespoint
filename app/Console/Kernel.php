@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\ImportGames::class,
+        \App\Console\Commands\ClearGames::class,
     ];
 
     /**
