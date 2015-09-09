@@ -64,6 +64,29 @@ class ImportGames extends Command
         $game->save();
     }
 
+    protected function downloadPlatformList($offset = 0, $limit = 0)
+    {
+        $json = file_get_contents("http://www.giantbomb.com/api/platforms/?api_key=$this->apiKey&format=json&limit=$limit&offset=$offset&field_list=id,name");
+        $obj = json_decode($json);
+        if ($obj->error !== "OK") throw new \Exception($obj->error);
+        return $obj;
+    }
+
+    protected function updatePlatforms()
+    {
+        $last = 0;
+        $obj = $this->downloadPlatformList();
+        $newarr = [];
+        $sites = (int)(($obj->number_of_total_results-$last)/100);
+        for ($site = 0; $site <= $sites; $site++) {
+            $obj = $this->downloadPlatformList(($site * 100) + $last);
+            for ($i = 0; $i < $obj->number_of_page_results; $i++) {
+                $newarr[$obj->results[$i]->id] = $obj->results[$i]->name;
+            }
+        }
+        $this->platformList = $newarr;
+    }
+
     /**
      * Get current game list from GiantBomb
      * @param int $platform
@@ -132,7 +155,7 @@ class ImportGames extends Command
     public function handle()
     {
         if (!empty($this->apiKey)){
-            $this->info('Available platforms: ' . implode(', ', $this->platformList));
+            $this->updatePlatforms();
             $platformTxt = $this->choice('What platform do you want update?', array_values($this->platformList));
             $platform = $this->getPlatformFromTxt($platformTxt);
             // TODO: Count only games of one platform!
