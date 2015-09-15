@@ -4,21 +4,21 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Game extends Model
+class Platform extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'games';
+    protected $table = 'platforms';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'original_release_date', 'small_image'];
+    protected $fillable = ['id', 'name'];
 
     /**
      * Indicates if the model should be timestamped.
@@ -28,18 +28,10 @@ class Game extends Model
     public $timestamps = false;
 
     /**
-     * The users that belong to the game.
-     */
-    public function users()
-    {
-        return $this->belongsToMany('App\User');
-    }
-
-    /**
      * The platforms which game is released on
      */
-    public function platforms()
+    public function games()
     {
-        return $this->belongsToMany('App\Platform');
+        return $this->belongsToMany('App\Game');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Game;
+use App\Platform;
 use Illuminate\Console\Command;
 
 class ImportGames extends Command
@@ -32,8 +33,7 @@ class ImportGames extends Command
      * Supported platforms and their unique IDs
      * @var array
      */
-    private $platformList = [146 => 'PlayStation 4',
-                             145 => 'Xbox One'];
+    private $platformList = [];
 
     /**
      * Create a new command instance.
@@ -44,6 +44,11 @@ class ImportGames extends Command
     {
         parent::__construct();
         $this->apiKey = env('GIANTBOMB_KEY');
+        $platforms = Platform::all();
+        foreach ($platforms as $platform)
+        {
+            $this->platformList[$platform->id] = $platform->name;
+        }
     }
 
     /**
@@ -55,13 +60,21 @@ class ImportGames extends Command
      */
     protected function saveGame($gameData, $platform)
     {
-        $game = new Game();
-        $game->id = $gameData->id;
-        $game->name = $gameData->name;
-        $game->platform = $platform;
-        $game->original_release_date = $gameData->original_release_date;
-        $game->small_image = $gameData->image !== null ? $gameData->image->small_url : null;
-        $game->save();
+        $game = Game::find($gameData->id);
+
+        if ($game === null) {
+            $game = new Game();
+            $game->id = $gameData->id;
+            $game->name = $gameData->name;
+            $game->platforms()->save(Platform::find($platform));
+            $game->original_release_date = $gameData->original_release_date;
+            $game->small_image = $gameData->image !== null ? $gameData->image->small_url : null;
+            $game->save();
+        }
+        else {
+            $game->platforms()->save(Platform::find($platform));
+            $game->save();
+        }
     }
 
     /**
@@ -106,7 +119,6 @@ class ImportGames extends Command
         for ($site = 0; $site <= $sites; $site++) {
             $obj = $this->downloadGameList($platform, ($site * 100) + $last);
             for ($i = 0; $i < $obj->number_of_page_results; $i++) {
-                // TODO: What if the game is for many platforms and already exist?
                 $this->saveGame($obj->results[$i], $platform);
             }
             $bar->advance();
@@ -132,11 +144,10 @@ class ImportGames extends Command
     public function handle()
     {
         if (!empty($this->apiKey)){
-            $this->info('Available platforms: ' . implode(', ', $this->platformList));
             $platformTxt = $this->choice('What platform do you want update?', array_values($this->platformList));
             $platform = $this->getPlatformFromTxt($platformTxt);
-            // TODO: Count only games of one platform!
-            $lastGame = Game::count();
+
+            $lastGame = Platform::find($platform)->games()->count();
             $gamesQty = $this->checkGamesQty($platform);
             $this->info('Quantity of games for platform ' . $platform . ':');
             $this->info('Local database: ' . $lastGame);
