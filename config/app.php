@@ -138,6 +138,11 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
+         * Extra Libraries Service Providers...
+         */
+        Barryvdh\Debugbar\ServiceProvider::class,
+
+        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
