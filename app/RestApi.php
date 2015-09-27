@@ -23,13 +23,15 @@ class RestApi {
             $this->setOffset($request->get('offset'));
             $this->number_of_total_results = DB::table('games')->count();
             $this->result = DB::table('games')->skip($this->offset)->take($this->limit)->get();
-            // TODO: Optimise the method below! 202 queries per 100 games!!!
+            // TODO: Optimise it!!! It's just temporary solution!
+            $platforms = DB::table('game_platform')->get();
             foreach ($this->result as $single)
             {
-                $platforms = Game::find($single->id)->platforms()->get();
                 foreach ($platforms as $platform)
                 {
-                    $single->platforms[] = $platform->id;
+                    if ($platform->game_id === $single->id) {
+                        $single->platforms[] = $platform->platform_id;
+                    }
                 }
             }
             $this->number_of_page_results = sizeof($this->result);
