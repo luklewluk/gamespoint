@@ -50,3 +50,7 @@ Route::get('/user/register', function(){
 Route::get('/games', 'GameController@index');
 // Game details
 Route::get('/game/{id}', 'GameController@show');
+
+// REST API
+Route::get('/api', 'RestController@index');
+Route::get('/api/games', 'RestController@games');
