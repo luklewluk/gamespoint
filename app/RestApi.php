@@ -3,6 +3,7 @@
 namespace App;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,24 +17,27 @@ class RestApi {
     protected $offset;
     protected $result;
 
-    public function games(Request $request)
+    public function allGames(Request $request)
     {
         try {
             $this->setLimit($request->get('limit'));
             $this->setOffset($request->get('offset'));
-            $this->number_of_total_results = DB::table('games')->count();
-            $this->result = DB::table('games')->skip($this->offset)->take($this->limit)->get();
-            // TODO: Optimise it!!! It's just temporary solution!
-            $platforms = DB::table('game_platform')->get();
-            foreach ($this->result as $single)
+            $this->number_of_total_results = Game::with('platforms')->count();
+
+            $games = Game::with('platforms')->skip($this->offset)->take($this->limit)->get();
+
+            foreach ($games as $game)
             {
-                foreach ($platforms as $platform)
-                {
-                    if ($platform->game_id === $single->id) {
-                        $single->platforms[] = $platform->platform_id;
-                    }
+                $temp = $game->toArray();
+                unset($temp['platforms']);
+                $platforms = $game->getRelation('platforms');
+                foreach ($platforms as $platform) {
+                    $temp['platforms'][] = $platform->getAttributeValue('id');
                 }
+                $this->result[] = $temp;
+                unset($temp);
             }
+
             $this->number_of_page_results = sizeof($this->result);
             $this->status_code = 1;
             $this->error = 'OK';
