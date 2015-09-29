@@ -22,7 +22,7 @@ class RestApi {
         try {
             $this->setLimit($request->get('limit'));
             $this->setOffset($request->get('offset'));
-            $this->number_of_total_results = Game::with('platforms')->count();
+            $this->number_of_total_results = Game::all()->count();
 
             $games = Game::with('platforms')->skip($this->offset)->take($this->limit)->get();
 
