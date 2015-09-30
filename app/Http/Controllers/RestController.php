@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\RestApi;
-use Illuminate\Http\Request;
-
+use App\Http\RestResponse;
 use App\Http\Requests;
-use Illuminate\Support\Facades\App;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class RestController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     *
+     * Display API manual
      *
      * @return Response
      */
@@ -20,14 +20,25 @@ class RestController extends Controller
         return view('rest');
     }
 
+    /**
+     *
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return \App\Http\RestResponse
+     */
     public function games(Request $request)
     {
         $rest = app('RestApi');
-
         $rest->allGames($request);
+
         // Debug:
         //var_dump($rest->getResponse());
         //return view('rest', $rest->getResponse());
-        return response()->json($rest->getResponse());
+
+        // Original response:
+        //return response()->json($rest->getResponse());
+
+        return RestResponse::make($rest->getResponse());
     }
 }

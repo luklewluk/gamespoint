@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Exception;
 use Illuminate\Http\Request;
 
 class RestApi
@@ -17,12 +18,32 @@ class RestApi
     protected $offset;
     protected $result;
 
+    /**
+     * @param Game $game
+     */
     public function __construct(Game $game)
     {
-
         $this->game = $game;
     }
 
+    /**
+     * Set status code by result data
+     */
+    protected function handleStatusCode()
+    {
+        if (!empty($this->result)){
+            $this->status_code = 200;
+        }
+        else {
+            $this->status_code = 404;
+        }
+        if ($this->error !== "OK") $this->status_code = 500;
+    }
+
+    /**
+     * Get all games from the library
+     * @param Request $request
+     */
     public function allGames(Request $request)
     {
         try {
@@ -44,14 +65,17 @@ class RestApi
             }
 
             $this->number_of_page_results = sizeof($this->result);
-            $this->status_code = 1;
             $this->error = 'OK';
-        } catch (\Exception $e) {
-            $this->status_code = 101;
+        } catch (Exception $e) {
             $this->error = $e;
         }
+        $this->handleStatusCode();
     }
 
+    /**
+     * Get array of JSON response
+     * @return array
+     */
     public function getResponse()
     {
         return [
@@ -74,6 +98,7 @@ class RestApi
     }
 
     /**
+     * Determine how many titles are to process
      * @param mixed $limit
      */
     public function setLimit($limit)
@@ -90,6 +115,7 @@ class RestApi
     }
 
     /**
+     * Set how many titles are to skip
      * @param mixed $offset
      */
     public function setOffset($offset)
