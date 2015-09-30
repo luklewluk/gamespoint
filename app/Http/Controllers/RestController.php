@@ -6,6 +6,7 @@ use App\RestApi;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\App;
 
 class RestController extends Controller
 {
@@ -21,7 +22,8 @@ class RestController extends Controller
 
     public function games(Request $request)
     {
-        $rest = new RestApi();
+        $rest = app('RestApi');
+
         $rest->allGames($request);
         // Debug:
         //var_dump($rest->getResponse());

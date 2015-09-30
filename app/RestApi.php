@@ -2,12 +2,12 @@
 
 namespace App;
 
-
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class RestApi {
+class RestApi
+{
+    /** @var Game $game */
+    protected $game;
 
     protected $status_code;
     protected $error;
@@ -17,14 +17,19 @@ class RestApi {
     protected $offset;
     protected $result;
 
+    public function __construct(Game $game)
+    {
+
+        $this->game = $game;
+    }
+
     public function allGames(Request $request)
     {
         try {
             $this->setLimit($request->get('limit'));
             $this->setOffset($request->get('offset'));
-            $this->number_of_total_results = Game::all()->count();
-
-            $games = Game::with('platforms')->skip($this->offset)->take($this->limit)->get();
+            $this->number_of_total_results = $this->game->all()->count();
+            $games = $this->game->with('platforms')->skip($this->offset)->take($this->limit)->get();
 
             foreach ($games as $game)
             {
