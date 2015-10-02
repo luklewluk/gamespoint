@@ -33,7 +33,7 @@ class ImportGames extends Command
      * Supported platforms and their unique IDs
      * @var array
      */
-    private $platformList = [];
+    protected $platformList = [];
 
     /**
      * Create a new command instance.
@@ -44,11 +44,6 @@ class ImportGames extends Command
     {
         parent::__construct();
         $this->apiKey = env('GIANTBOMB_KEY');
-        $platforms = Platform::all();
-        foreach ($platforms as $platform)
-        {
-            $this->platformList[$platform->id] = $platform->name;
-        }
     }
 
     /**
@@ -144,6 +139,7 @@ class ImportGames extends Command
     public function handle()
     {
         if (!empty($this->apiKey)){
+            $this->setPlatformList(Platform::all());
             $platformTxt = $this->choice('What platform do you want update?', array_values($this->platformList));
             $platform = $this->getPlatformFromTxt($platformTxt);
 
@@ -165,6 +161,17 @@ class ImportGames extends Command
         }
         else {
             $this->error('No API Key provided in .env file');
+        }
+    }
+
+    /**
+     * @param array $platforms
+     */
+    public function setPlatformList($platforms)
+    {
+        foreach ($platforms as $platform)
+        {
+            $this->platformList[$platform->id] = $platform->name;
         }
     }
 }
