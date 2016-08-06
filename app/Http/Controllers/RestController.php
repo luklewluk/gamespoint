@@ -25,19 +25,13 @@ class RestController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
+     *
      * @return \App\Http\RestResponse
      */
     public function games(Request $request)
     {
         $rest = app('RestApi');
         $rest->allGames($request);
-
-        // Debug:
-        //var_dump($rest->getResponse());
-        //return view('rest', $rest->getResponse());
-
-        // Original response:
-        //return response()->json($rest->getResponse());
 
         return RestResponse::make($rest->getResponse());
     }

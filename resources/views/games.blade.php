@@ -21,7 +21,7 @@
                         <h3>{{ $game->name }}</h3>
                         <p>...</p>
                         <p>
-                            @if (!$game->own)
+                            @if (!$game->user_id)
                                 <a href="{{ url('/user/library/add/' . $game->id) }}" class="btn btn-success" role="button">Add to library</a>
                             @else
                                 <a href="{{ url('/user/library/remove/' . $game->id) }}" class="btn btn-danger" role="button">Remove from library</a>

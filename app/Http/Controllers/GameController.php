@@ -3,39 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Game;
-use App\Platform;
-use Illuminate\Http\Request;
-
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 class GameController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display listing all games
      *
      * @return Response
      */
     public function index()
     {
-        //$platform = Platform::find(146);
-        //$games = $platform->games()->orderBy('name')->paginate(16);
-
-        $games = Game::orderBy('name')->paginate(16);
-        $games->setPath('games');
-        $user = Auth::user();
-
-        foreach ($games as $game)
-        {
-            if ($user->games()->where('game_id', $game->id)->first()) {
-                $game->own = true;
-            }
-            else {
-                $game->own = false;
-            }
-        }
+        $games = Game::orderBy('name')
+            ->leftjoin('game_user', function ($join) {
+                $join->on('games.id', '=', 'game_user.game_id')->where('game_user.user_id', '=', Auth::user()->id);
+            })
+            ->paginate(16)
+        ;
 
         return view('games', ['games' => $games]);
     }
