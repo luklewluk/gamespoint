@@ -1,0 +1,13 @@
+production:
+  host: host
+  user: user
+  password: pass
+  stage: production
+  deploy_path: path
+
+test:
+  host: host
+  user: user
+  password: pass
+  stage: beta
+  deploy_path: path
