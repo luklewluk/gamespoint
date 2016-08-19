@@ -16,3 +16,5 @@
 /web/bundles/
 /.idea/
 servers.yml
+/.vagrant/
+Homestead.yaml
