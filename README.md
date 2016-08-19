@@ -1,7 +1,7 @@
 # Games Point
 [![Build Status](https://travis-ci.org/luklewluk/gamespoint.svg?branch=master)](https://travis-ci.org/luklewluk/gamespoint)
 
-A Symfony based project for managing games collection
+A Symfony based project to manage games collection
 
 Laravel version is still available in "laravel" branch.
 
