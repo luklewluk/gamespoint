@@ -1,3 +1,8 @@
+giantbomb_import:
+    resource: "@GiantbombImportBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
