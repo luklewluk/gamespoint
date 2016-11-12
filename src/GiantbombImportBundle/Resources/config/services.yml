@@ -1,0 +1,7 @@
+services:
+     giantbomb_import_bundle.platform.provider:
+         class: GiantbombImportBundle\Provider\PlatformProvider
+         arguments: ["@giantbomb.client"]
+     giantbomb_import_bundle.platform.processor:
+         class: GiantbombImportBundle\Processor\PlatformProcessor
+         arguments: ["@doctrine.orm.entity_manager"]

@@ -2,13 +2,25 @@
 
 namespace GiantbombImportBundle\Command;
 
-use DBorsatto\GiantBomb\Client;
+use AppBundle\Repository\PlatformRepository;
+use DBorsatto\GiantBomb;
+use GiantbombImportBundle\Processor\PlatformProcessor;
+use GiantbombImportBundle\Provider\PlatformProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Commands for GiantBomb platform import
+ *
+ * @package GiantbombImportBundle\Command
+ * @author  Lukasz Lewandowski <luklewluk@gmail.com>
+ */
 class ImportPlatformsCommand extends ContainerAwareCommand
 {
+    /**
+     * Commands configuration
+     */
     protected function configure()
     {
         $this
@@ -17,22 +29,35 @@ class ImportPlatformsCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * Execute the current command
+     *
+     * @param InputInterface  $input  An InputInterface instance
+     * @param OutputInterface $output An OutputInterface instance
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Todo: implement import
+        /** @var PlatformProvider $provider */
+        $provider = $this->getContainer()->get('giantbomb_import_bundle.platform.provider');
+        /** @var PlatformProcessor $processor */
+        $processor = $this->getContainer()->get('giantbomb_import_bundle.platform.processor');
+        /** @var PlatformRepository $platformRepository */
+        $platformRepository = $this->getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->getRepository('AppBundle:Platform')
+        ;
+
+        $existingPlatforms = $platformRepository->totalItems();
+
+        if ($existingPlatforms > 0) {
+            $platformList = $provider->getNewPlatformList($existingPlatforms);
+        } else {
+            $platformList = $provider->getFullPlatformList();
+        }
+
+        $processor->process($platformList);
+
+        $output->writeln(sprintf('Processed %s platforms', count($platformList)));
     }
-
-    protected function getPlatformList($offset = 0, $limit = 0)
-    {
-        /** @var Client $client */
-        $client = $this->getContainer()->get('giantbomb.client');
-        $platforms = $client->getRepository('Platform')->query()
-            ->setFieldList(['id', 'name'])
-            ->setParameter('limit', $limit)
-            ->setParameter('offset', $offset)
-            ->find();
-
-        return $platforms;
-    }
-
 }
