@@ -6,7 +6,7 @@ use AppBundle\Repository\PlatformRepository;
 use DBorsatto\GiantBomb;
 use GiantbombImportBundle\Processor\PlatformProcessor;
 use GiantbombImportBundle\Provider\PlatformProvider;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,8 +16,36 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package GiantbombImportBundle\Command
  * @author  Lukasz Lewandowski <luklewluk@gmail.com>
  */
-class ImportPlatformsCommand extends ContainerAwareCommand
+class ImportPlatformsCommand extends Command
 {
+    /** @var PlatformProvider Platform API provider */
+    protected $provider;
+
+    /** @var PlatformProcessor Platform Processor */
+    protected $processor;
+
+    /** @var PlatformRepository Platform Repository */
+    protected $repository;
+
+    /**
+     * Constructor
+     *
+     * @param PlatformProvider   $provider   Platform Provider
+     * @param PlatformProcessor  $processor  Platform Processor
+     * @param PlatformRepository $repository Platform Repository
+     */
+    public function __construct(
+        PlatformProvider $provider,
+        PlatformProcessor $processor,
+        PlatformRepository $repository
+    ) {
+        parent::__construct();
+
+        $this->provider = $provider;
+        $this->processor = $processor;
+        $this->repository = $repository;
+    }
+
     /**
      * Commands configuration
      */
@@ -37,26 +65,15 @@ class ImportPlatformsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var PlatformProvider $provider */
-        $provider = $this->getContainer()->get('giantbomb_import_bundle.platform.provider');
-        /** @var PlatformProcessor $processor */
-        $processor = $this->getContainer()->get('giantbomb_import_bundle.platform.processor');
-        /** @var PlatformRepository $platformRepository */
-        $platformRepository = $this->getContainer()
-            ->get('doctrine')
-            ->getManager()
-            ->getRepository('AppBundle:Platform')
-        ;
-
-        $existingPlatforms = $platformRepository->totalItems();
+        $existingPlatforms = $this->repository->totalItems();
 
         if ($existingPlatforms > 0) {
-            $platformList = $provider->getNewPlatformList($existingPlatforms);
+            $platformList = $this->provider->getNewPlatformList($existingPlatforms);
         } else {
-            $platformList = $provider->getFullPlatformList();
+            $platformList = $this->provider->getFullPlatformList();
         }
 
-        $processor->process($platformList);
+        $this->processor->process($platformList);
 
         $output->writeln(sprintf('Processed %s platforms', count($platformList)));
     }

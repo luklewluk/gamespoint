@@ -1,7 +1,22 @@
 services:
+     repository_platform:
+         class: Doctrine\ORM\EntityRepository
+         factory: ["@doctrine.orm.entity_manager", getRepository]
+         arguments:
+             - AppBundle\Entity\Platform
+
      giantbomb_import_bundle.platform.provider:
          class: GiantbombImportBundle\Provider\PlatformProvider
          arguments: ["@giantbomb.client"]
      giantbomb_import_bundle.platform.processor:
          class: GiantbombImportBundle\Processor\PlatformProcessor
          arguments: ["@doctrine.orm.entity_manager"]
+
+     app.command.import_platforms:
+         class: GiantbombImportBundle\Command\ImportPlatformsCommand
+         arguments:
+             - "@giantbomb_import_bundle.platform.provider"
+             - "@giantbomb_import_bundle.platform.processor"
+             - "@repository_platform"
+         tags:
+             - { name: console.command }
