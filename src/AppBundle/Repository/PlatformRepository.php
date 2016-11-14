@@ -17,11 +17,6 @@ class PlatformRepository extends \Doctrine\ORM\EntityRepository
      */
     public function totalItems()
     {
-        $qb = $this->createQueryBuilder('total_items')
-            ->select('count(platform.id)')
-            ->from('AppBundle:platform', 'platform')
-        ;
-
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return count($this->findAll());
     }
 }
